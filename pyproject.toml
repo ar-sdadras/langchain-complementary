@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "langcomp"
+version = "0.1.0"
+description = "A developer-friendly, high-level complementary framework for LangChain, LangGraph, and DeepAgents."
+readme = "README.md"
+authors = [
+    { name = "AR_S.DADRAS", email = "ar-sdadras@github.com" }
+]
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = [
+    "langchain-core>=0.3.0",
+    "langgraph>=0.2.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "python-dotenv>=1.0.0",
+]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q --asyncio-mode=auto"
+testpaths = [
+    "tests",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/langcomp"]
