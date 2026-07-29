@@ -24,6 +24,13 @@ class Agent:
         self.graph = compiled_graph
         self.state_schema = state_schema or SmartState.create_schema()
 
+    @classmethod
+    def from_runnable(cls, runnable: Any, name: str = "LangChainAgent") -> "Agent":
+        """
+        Wrap any runnable compiled graph produced by LangChain create_agent() or DeepAgents create_deep_agent().
+        """
+        return cls(name=name, compiled_graph=runnable)
+
     def invoke(
         self,
         input_data: Union[str, Dict[str, Any], List[Any]],

@@ -55,6 +55,17 @@ class SubAgent(BaseModel):
 
         return subagent_tool
 
+    def to_deepagents_subagent_dict(self) -> Dict[str, Any]:
+        """
+        Convert this SubAgent instance into a dictionary format compatible with DeepAgents / LangChain SubAgentMiddleware.
+        """
+        return {
+            "name": self.name,
+            "description": self.description,
+            "system_prompt": f"You are subagent '{self.name}'. {self.description}",
+            "runnable": self.agent_instance.graph if isinstance(self.agent_instance, Agent) else self.agent_instance
+        }
+
 
 class SwarmPool:
     """
