@@ -93,9 +93,51 @@ print(result)
 
 ---
 
-## 💡 Best Practices for Swarms
+## 💡 3. Interoperability with Modern LangChain `create_agent()` and `DeepAgents`
 
-> [!TIP]
-> 1. **Clear Descriptions:** Always provide clear, precise descriptions when registering subagents so supervisor models know exactly when to route tasks to them.
-> 2. **Capability Tagging:** Use `capabilities=["tag1", "tag2"]` to programmatically filter or query subagents from the pool.
-> 3. **Isolated Thread IDs:** `SubAgent.run()` automatically scopes thread IDs (`subagent_{name}`), keeping conversation history isolated per worker.
+Modern LangChain 1.x (`create_agent()`) and **DeepAgents** (`create_deep_agent()`) introduce built-in `SubAgentMiddleware` and `CompiledSubAgent` patterns.
+
+`langcomp` provides full native interoperability with both:
+
+### Exporting `langcomp` SubAgents to DeepAgents / LangChain Middleware
+
+```python
+from langcomp import SwarmPool, SubAgent
+
+pool = SwarmPool("CrossFrameworkPool")
+sub = pool.register(
+    name="security_reviewer",
+    description="Reviews code for security issues and line-level severity",
+    agent_or_callable=my_reviewer_logic,
+)
+
+# Export as dictionary compatible with DeepAgents SubAgentMiddleware
+deepagents_sub_dict = sub.to_deepagents_subagent_dict()
+# Pass directly into DeepAgents or LangChain create_agent():
+# agent = create_deep_agent(model="gemini-3.6-flash", subagents=[deepagents_sub_dict])
+```
+
+### Wrapping `create_agent()` / `create_deep_agent()` Runnables into `langcomp`
+
+```python
+from langchain.agents import create_agent
+from langcomp import Agent
+
+# Create an agent using modern LangChain 1.x
+lc_agent_runnable = create_agent(
+    model="claude-sonnet-4-6",
+    tools=[my_tool],
+)
+
+# Wrap into langcomp Agent to enable local ASCII/Mermaid visualizers & DryRunner
+langcomp_agent = Agent.from_runnable(lc_agent_runnable, name="WrappedLCAgent")
+```
+
+---
+
+## 📌 Summary Checklist
+
+- [x] Understand how subagent tool execution prevents supervisor context bloat.
+- [x] Register subagents into `SwarmPool` and export them as LangChain tools.
+- [x] Export `SubAgent` dicts for modern LangChain `create_agent()` and `DeepAgents` `SubAgentMiddleware`.
+
